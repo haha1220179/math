@@ -1,0 +1,54 @@
+import math
+import random
+import matplotlib.pyplot as plt
+import numpy as np
+
+# ขนาดหน้าจอ
+WIDTH, HEIGHT = 100, 100
+
+# สุ่มจุดที่ไม่ซ้ำกัน
+def generate_points():
+    while True:
+        shooter = (random.randint(0, WIDTH), random.randint(0, HEIGHT))
+        target = (random.randint(0, WIDTH), random.randint(0, HEIGHT))
+        if shooter != target:
+            return shooter, target
+
+# แสดงกราฟการยิง
+def plot_shot(shooter, target, formula_str):
+    try:
+        x_vals = np.linspace(min(shooter[0], target[0]) - 10, max(shooter[0], target[0]) + 10, 500)
+        x = x_vals  # สำหรับใช้ใน eval
+        y = eval(formula_str)
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(x_vals, y, label="Your Shot", color='blue')
+        plt.scatter(*shooter, color='green', label='Shooter')
+        plt.scatter(*target, color='red', label='Target')
+        plt.title('2D Math-Based Shooting Game')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.grid(True)
+        plt.legend()
+        plt.show()
+
+        # ตรวจว่าผ่านเป้าหมายหรือไม่
+        target_x, target_y = target
+        index = (np.abs(x_vals - target_x)).argmin()
+        shot_y = y[index]
+        if abs(shot_y - target_y) < 3:  # เผื่อความผิดพลาดเล็กน้อย
+            print("\n🎯 HIT! Nice shot!")
+        else:
+            print("\n❌ MISS! Try again.")
+
+    except Exception as e:
+        print(f"\nError evaluating formula: {e}")
+
+# เริ่มเกม
+shooter, target = generate_points()
+print(f"Shooter at: {shooter}")
+print(f"Target at: {target}")
+print("\nEnter your shot as a function of x (e.g., -0.05*(x - 10)**2 + 50 or 20*np.sin(x/10)+50)")
+formula_str = input("y = ")
+
+plot_shot(shooter, target, formula_str)
